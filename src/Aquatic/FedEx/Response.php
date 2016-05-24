@@ -6,7 +6,7 @@ use Aquatic\FedEx\Response\Contract;
 
 class Response implements Contract
 {
-    public function parse(array $response): Response
+    public function parse($response)
     {
         foreach($response as $property => $value)
             $this->$property = $value;

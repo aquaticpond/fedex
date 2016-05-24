@@ -10,5 +10,5 @@ interface Contract
      * @param $response object: the raw response from FedEx SOAP API
      * @returns Response
      */
-    public function parse(array $response): Contract;
+    public function parse($response);
 }
