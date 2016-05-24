@@ -48,6 +48,8 @@ abstract class Request implements RequestContract
         $this->_credentials['Version']['Major'] = $major;
         $this->_credentials['Version']['Intermediate'] = $intermediate;
         $this->_credentials['Version']['Minor'] = $minor;
+
+        return $this;
     }
 
     public function send(ResponseContract $response_parser = null): ResponseContract
