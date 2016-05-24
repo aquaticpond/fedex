@@ -30,8 +30,8 @@ abstract class Request implements RequestContract
         'Version' => [
             'ServiceId'    => null,
             'Major'        => null,
-            'Intermediate' => '0',
-            'Minor'        => '0'
+            'Intermediate' => null,
+            'Minor'        => null,
         ]
     ];
 
@@ -43,7 +43,11 @@ abstract class Request implements RequestContract
         $this->_credentials['ClientDetail']['MeterNumber'] = $meterNumber;
 
         $this->_credentials['Version']['ServiceId'] = $this->_serviceId;
-        $this->_credentials['Version']['Major'] = $this->_version;
+
+        list($major, $intermediate, $minor) = explode('.', $this->_version);
+        $this->_credentials['Version']['Major'] = $major;
+        $this->_credentials['Version']['Intermediate'] = $intermediate;
+        $this->_credentials['Version']['Minor'] = $minor;
     }
 
     public function send(ResponseContract $response = null): ResponseContract
@@ -52,8 +56,6 @@ abstract class Request implements RequestContract
 
         $method = $this->_soapMethod;
         $data = array_merge($this->_credentials, $this->data);
-
-        $this->setCredentials(getenv('FEDEX_KEY'), getenv('FEDEX_PASSWORD'), getenv('FEDEX_ACCOUNT_NUMBER'), getenv('FEDEX_METER_NUMBER'));
 
         $result = $soap->$method($data);
 
