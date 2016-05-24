@@ -50,7 +50,7 @@ abstract class Request implements RequestContract
         $this->_credentials['Version']['Minor'] = $minor;
     }
 
-    public function send(ResponseContract $response = null): ResponseContract
+    public function send(ResponseContract $response_parser = null): ResponseContract
     {
         $soap = new \SoapClient($this->_getWsdl(), ['trace' => 1]);
 
@@ -59,10 +59,10 @@ abstract class Request implements RequestContract
 
         $result = $soap->$method($data);
 
-        if(!$response)
-            $response = new Response;
+        if(!$response_parser)
+            $response_parser = new Response;
 
-        return $response->parse($result);
+        return $response_parser->parse($result);
     }
 
     protected function _getWsdl(): string
