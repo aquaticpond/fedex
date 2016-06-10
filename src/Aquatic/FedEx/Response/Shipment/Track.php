@@ -18,9 +18,10 @@ class Track implements Contract
         1 => 'In Transit',
         2 => 'Delivered'
     ];
+    
     protected $raw;
 
-    public function __construct($tracking_code = null)
+    public function __construct()
     {
         $this->raw = null;
         $this->success = null;
@@ -34,7 +35,6 @@ class Track implements Contract
         $this->status = static::$statusCodes[$this->_status];
         $this->events = [];
         $this->last_update = Carbon::now();
-
     }
 
     public function getRaw()
