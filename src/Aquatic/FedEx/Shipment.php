@@ -4,7 +4,7 @@ namespace Aquatic\FedEx;
 
 use Aquatic\FedEx\Contract\Shipment as Contract;
 use Aquatic\FedEx\Contract\Shipment\Item;
-use Aquatic\FedEx\Contract\Address;
+use Aquatic\FedEx\Contract\Address as AddressContract;
 
 
 class Shipment implements Contract
@@ -13,9 +13,10 @@ class Shipment implements Contract
            $totalWeight = 0.00,
            $totalPrice = 0.00,
            $weightUnits = 'LB',
+           $packageCount = 1,
            $destination;
 
-    public function __construct(Address $destination, array $items = [])
+    public function __construct(AddressContract $destination, array $items = [])
     {
         $this->destination = $destination;
         $this->addItems($items);
@@ -34,9 +35,11 @@ class Shipment implements Contract
         $this->items[] = $item;
         $this->totalWeight += $item->getWeight();
         $this->totalPrice += $item->getPrice();
+
+        return $this;
     }
 
-    public function getDestination(): Address
+    public function getDestination(): AddressContract
     {
         return $this->destination;
     }
@@ -59,5 +62,10 @@ class Shipment implements Contract
     public function getItems(): array
     {
         return $this->items;
+    }
+
+    public function getPackageCount(): int
+    {
+        return $this->packageCount;
     }
 }

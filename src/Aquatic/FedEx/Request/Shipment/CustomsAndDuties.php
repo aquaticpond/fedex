@@ -2,7 +2,7 @@
 
 namespace Aquatic\FedEx\Request\Shipment;
 
-use Aquatic\FedEx\Contract\Request;
+use Aquatic\FedEx\Request;
 use Aquatic\FedEx\Contract\Address;
 use Aquatic\FedEx\Contract\Shipment;
 use Aquatic\FedEx\Contract\Shipment\Item;

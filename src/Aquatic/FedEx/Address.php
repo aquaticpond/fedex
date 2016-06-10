@@ -39,7 +39,7 @@ class Address implements Contract
 
     public function getPostCode(): string
     {
-        return $this->postCode();
+        return $this->postCode;
     }
 
     public function getCountryCode(): string

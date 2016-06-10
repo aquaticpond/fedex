@@ -11,4 +11,5 @@ interface Shipment
     public function getTotalPrice(): float;
     public function getWeightUnits(): string;
     public function getItems(): array;
+    public function getPackageCount(): int;
 }
