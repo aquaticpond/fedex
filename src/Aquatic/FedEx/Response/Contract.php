@@ -2,6 +2,8 @@
 
 namespace Aquatic\FedEx\Response;
 
+use Aquatic\FedEx\Request\Contract as RequestContract;
+
 interface Contract
 {
     /*
@@ -10,5 +12,5 @@ interface Contract
      * @param $response object: the raw response from FedEx SOAP API
      * @returns Response
      */
-    public function parse($response): Contract;
+    public function parse($response, RequestContract $request): Contract;
 }

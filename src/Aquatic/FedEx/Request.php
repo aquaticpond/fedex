@@ -64,7 +64,7 @@ abstract class Request implements RequestContract
         if(!$response_parser)
             $response_parser = new Response;
 
-        return $response_parser->parse($result);
+        return $response_parser->parse($result, $this);
     }
 
     protected function _getWsdl(): string

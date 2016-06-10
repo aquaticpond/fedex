@@ -3,9 +3,10 @@
 namespace Aquatic\FedEx\Response\Shipment;
 
 use Carbon\Carbon;
-use Aquatic\FedEx\Response\Contract;
+use Aquatic\FedEx\Response\Contract as ResponseContract;
+use Aquatic\FedEx\Request\Contract as RequestContract;
 
-class Track implements Contract
+class Track implements ResponseContract
 {
     const STATUS_ERROR = -1;
     const STATUS_PACKED = 0;
@@ -18,7 +19,7 @@ class Track implements Contract
         1 => 'In Transit',
         2 => 'Delivered'
     ];
-    
+
     protected $raw;
 
     public function __construct()
@@ -57,8 +58,9 @@ class Track implements Contract
         return $this->_status == static::STATUS_DELIVERED;
     }
 
-    public function parse($response): Contract
+    public function parse($response, RequestContract $request): ResponseContract
     {
+        $this->request = $request;
         $this->raw = $response;
         $this->failed = 1;
 
