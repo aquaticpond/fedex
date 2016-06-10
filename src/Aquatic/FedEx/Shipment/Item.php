@@ -11,7 +11,7 @@ class Item implements Contract
            $price = 0.00,
            $qtyOrdered = 1,
            $weight = 0.00,
-           $weightUnits = 'LBS',
+           $weightUnits = 'LB',
            $numberOfPieces = 1,
            $countryOfManufacture = 'US',
            $htsCode = '',

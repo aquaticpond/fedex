@@ -12,7 +12,7 @@ class Shipment implements Contract
     public $items = [],
            $totalWeight = 0.00,
            $totalPrice = 0.00,
-           $weightUnits = 'LBS',
+           $weightUnits = 'LB',
            $destination;
 
     public function __construct(Address $destination, array $items = [])
