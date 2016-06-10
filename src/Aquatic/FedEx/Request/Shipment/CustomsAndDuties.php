@@ -19,10 +19,10 @@ class CustomsAndDuties extends Request
         $this->data = [
             'ReturnTransitAndCommit' => true,
             'RequestedShipment' => [
-                'EdtRequestType'    => 'All',
+                'EdtRequestType'    => 'ALL',
                 'ShipTimestamp'     => date('c'),
                 'DropoffType'       => 'REGULAR_PICKUP',
-                'RateRequestTypes'  => 'list',
+                'RateRequestTypes'  => 'LIST',
                 'PreferredCurrency' => 'USD',
                 'ShippingChargesPayment' => [
                     'PaymentType' => 'SENDER',
@@ -65,11 +65,11 @@ class CustomsAndDuties extends Request
                         'Currency' => 'USD',
                         'Amount'   => $shipment->getTotalPrice()
                     ],
-                    'Commodities'   => $this->parseShipmentItemsToRequestCommodities($shipment),
-                    'RequestedPackageLineItems' => $this->parseShipmentPackageLineItems($shipment),
-                    'PackageCount'  => $shipment->getPackageCount(),
-                    'PackageDetail' => 'INDIVIDUAL_PACKAGES',
-                ]
+                    'Commodities'   => $this->parseShipmentItemsToRequestCommodities($shipment)
+                ],
+                'RequestedPackageLineItems' => $this->parseShipmentPackageLineItems($shipment),
+                'PackageCount'  => $shipment->getPackageCount(),
+                'PackageDetail' => 'INDIVIDUAL_PACKAGES',
             ]
         ];
     }
