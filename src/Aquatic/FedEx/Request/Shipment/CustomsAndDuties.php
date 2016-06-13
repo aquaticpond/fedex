@@ -10,6 +10,7 @@ class CustomsAndDuties extends Request
     public $_serviceId = 'crs';
     public $_wsdl = 'RateService_v18.wsdl';
     public $_soapMethod = 'getRates';
+    
     public function __construct(Shipment $shipment, Address $shipper)
     {
         $this->data = [
