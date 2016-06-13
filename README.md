@@ -25,5 +25,5 @@ $items = [
 ];
 
 $shipment = new Shipment($destination, $items);
-$result = FedEx::customsAndDuties($shipment, $shipper);
+$response = FedEx::customsAndDuties($shipment, $shipper);
 ```
