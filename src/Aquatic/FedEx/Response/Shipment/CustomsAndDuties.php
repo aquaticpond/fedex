@@ -2,29 +2,30 @@
 
 namespace Aquatic\FedEx\Response\Shipment;
 
-use Carbon\Carbon;
+use Aquatic\FedEx\Response;
+use Aquatic\FedEx\Request\Shipment\CustomsAndDuties as Request;
 use Aquatic\FedEx\Request\Contract as RequestContract;
 use Aquatic\FedEx\Response\Contract as ResponseContract;
-use Aquatic\FedEx\Response\Mixin\NotificationParser;
 
-class CustomsAndDuties implements ResponseContract
+class CustomsAndDuties extends Response
 {
-    use NotificationParser;
-    
-    protected $raw;
+    protected $_items = [];
+
+    public function __construct($items = [])
+    {
+        $this->_items = $items;
+    }
 
     public function parse($response, RequestContract $request): ResponseContract
     {
-        $this->raw = $response;
-        $this->request = $request;
-        
-        $this->parseNotifications($response);
+        parent::parse($response, $request);
 
+        return $this;
     }
 
-    public function getRaw()
+    public function getItems(): array
     {
-        return $this->raw;
+        return $this->_items;
     }
 
 }

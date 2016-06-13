@@ -13,4 +13,6 @@ interface Contract
      * @returns Response
      */
     public function parse($response, RequestContract $request): Contract;
+    public function getRaw();
+    public function getRequest(): RequestContract;
 }

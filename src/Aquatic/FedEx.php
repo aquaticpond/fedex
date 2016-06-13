@@ -24,6 +24,6 @@ class FedEx
     {
         return (new CustomsAndDutiesRequest($shipment, $shipper))
             ->setCredentials(getenv('FEDEX_KEY'), getenv('FEDEX_PASSWORD'), getenv('FEDEX_ACCOUNT_NUMBER'), getenv('FEDEX_METER_NUMBER'))
-            ->send();
+            ->send(new CustomsAndDutiesParser($shipment->getItems()));
     }
 }

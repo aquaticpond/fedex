@@ -3,10 +3,12 @@
 namespace Aquatic\FedEx\Response\Shipment;
 
 use Carbon\Carbon;
-use Aquatic\FedEx\Response\Contract as ResponseContract;
+use Aquatic\FedEx\Request;
+use Aquatic\FedEx\Response;
 use Aquatic\FedEx\Request\Contract as RequestContract;
+use Aquatic\FedEx\Response\Contract as ResponseContract;
 
-class Track implements ResponseContract
+class Track extends Response
 {
     const STATUS_ERROR = -1;
     const STATUS_PACKED = 0;
@@ -19,8 +21,6 @@ class Track implements ResponseContract
         1 => 'In Transit',
         2 => 'Delivered'
     ];
-
-    protected $raw;
 
     public function __construct()
     {
@@ -36,11 +36,6 @@ class Track implements ResponseContract
         $this->status = static::$statusCodes[$this->_status];
         $this->events = [];
         $this->last_update = Carbon::now();
-    }
-
-    public function getRaw()
-    {
-        return $this->raw;
     }
 
     public function isInTransit(): bool
@@ -60,8 +55,8 @@ class Track implements ResponseContract
 
     public function parse($response, RequestContract $request): ResponseContract
     {
-        $this->request = $request;
-        $this->raw = $response;
+        parent::parse($response, $request);
+
         $this->failed = 1;
 
         if($response->CompletedTrackDetails->TrackDetails->Notification->Severity != 'SUCCESS')
