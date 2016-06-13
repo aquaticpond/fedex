@@ -1,5 +1,4 @@
-# fedex
-## PHP7 wrapper for FedEx SOAP APIs
+# PHP7 wrapper for FedEx SOAP APIs
 
 ### Track a shipment
 ```php
