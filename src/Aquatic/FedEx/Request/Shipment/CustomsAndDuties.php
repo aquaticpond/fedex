@@ -1,131 +1,75 @@
 <?php
 
-namespace Aquatic\FedEx\Request\Shipment;
+namespace Aquatic\FedEx\Response\Shipment;
 
-use Aquatic\FedEx\Request;
-use Aquatic\FedEx\Contract\Address;
-use Aquatic\FedEx\Contract\Shipment;
-use Aquatic\FedEx\Contract\Shipment\Item;
+use Aquatic\FedEx\Response;
+use Aquatic\FedEx\Request\Shipment\CustomsAndDuties as Request;
+use Aquatic\FedEx\Request\Contract as RequestContract;
+use Aquatic\FedEx\Response\Contract as ResponseContract;
 
-class CustomsAndDuties extends Request
+class CustomsAndDuties extends Response
 {
-    public $_version = '18.0.0';
-    public $_serviceId = 'crs';
-    public $_wsdl = 'RateService_v18.wsdl';
-    public $_soapMethod = 'getRates';
+    protected $_items = [];
+    protected $_totalDuties = 0.00;
 
-    public function __construct(Shipment $shipment, Address $shipper)
+    public function __construct($items = [])
     {
-        $this->data = [
-            'ReturnTransitAndCommit' => true,
-            'RequestedShipment' => [
-                'EdtRequestType'    => 'ALL',
-                'ShipTimestamp'     => date('c'),
-                'DropoffType'       => 'REGULAR_PICKUP',
-                'RateRequestTypes'  => 'LIST',
-                'PreferredCurrency' => 'USD',
-                'ShippingChargesPayment' => [
-                    'PaymentType' => 'SENDER',
-                    'Payor' => [
-                        'ResponsibleParty' => [
-                            'AccountNumber' => null,
-                            'CountryCode' => 'US'
-                        ]
-                    ]
-                ],
-                'Shipper' => [
-                    'Address' => [
-                        'StreetLines'           => $shipper->getStreet(),
-                        'City'                  => $shipper->getCity(),
-                        'PostalCode'            => $shipper->getPostCode(),
-                        'CountryCode'           => $shipper->getCountryCode(),
-                        'StateOrProvinceCode'   => $shipper->getStateCode()
-                    ]
-                ],
-                'Recipient' => [
-                    'Address' => [
-                        'StreetLines'   => $shipment->getDestination()->getStreet(),
-                        'City'          => $shipment->getDestination()->getCity(),
-                        'PostalCode'    => $shipment->getDestination()->getPostCode(),
-                        'CountryCode'   => $shipment->getDestination()->getCountryCode(),
-                    ]
-                ],
-                'CustomsClearanceDetail' => [
-                    'DutiesPayment' => [
-                        'PaymentType' => 'SENDER',
-                        'Payor' => [
-                            'ResponsibleParty' => [
-                                'AccountNumber' => null,
-                                'CountryCode'   => 'US',
-                            ]
-                        ]
-                    ],
-                    'DocumentContent' => 'NON_DOCUMENTS',
-                    'CustomsValue' => [
-                        'Currency' => 'USD',
-                        'Amount'   => $shipment->getTotalPrice()
-                    ],
-                    'Commodities'   => $this->parseShipmentItemsToRequestCommodities($shipment)
-                ],
-                'RequestedPackageLineItems' => $this->parseShipmentPackageLineItems($shipment),
-                'PackageCount'  => $shipment->getPackageCount(),
-                'PackageDetail' => 'INDIVIDUAL_PACKAGES',
-            ]
-        ];
+        $this->_items = $items;
     }
 
-    protected function parseShipmentPackageLineItems(Shipment $shipment): array
+    public function parse($response, RequestContract $request): ResponseContract
     {
-        return [ 0 => [
-            'SequenceNumber' => 1,
-            'GroupPackageCount' => 1,
-            'Weight' => [
-                'Value' => $shipment->getTotalWeight(),
-                'Units' => $shipment->getWeightUnits(),
-            ]
-        ]];
-    }
+        parent::parse($response, $request);
 
-    protected function parseShipmentItemsToRequestCommodities(Shipment $shipment): array
-    {
-        $commodities = [];
+        $check_types = ['INTERNATIONAL_PRIORITY', 'INTERNATIONAL_ECONOMY'];
 
-        foreach($shipment->getItems() as $item)
+        foreach($response->RateReplyDetails as $shipping_method)
         {
-            $commodities[] = [
-                'Name'           => $item->getId(),
-                'NumberOfPieces' => $item->getNumberOfPieces(),
-                'Description'    => $item->getDescription(),
-                'CountryOfManufacture'  => $item->getCountryOfManufacture(),
-                'Weight' => [
-                    'Units' => $shipment->getWeightUnits(),
-                    'Value' => $item->getWeight(),
-                ],
-                'Quantity' => $item->getQtyOrdered(),
-                'QuantityUnits' => 'EA',
-                'UnitPrice' => [
-                    'Currency' => 'USD',
-                    'Amount'   => $item->getPrice(),
-                ],
-                'CustomsValue' => [
-                    'Currency' => 'USD',
-                    'Amount' => $item->getPrice(),
-                ],
-                'HarmonizedCode' => $item->getHTSCode()
-            ];
+            if(!in_array($shipping_method->ServiceType, $check_types) || $this->_totalDuties > 0) continue;
+            foreach($shipping_method->RatedShipmentDetails as $detail)
+            {
+                if($this->_totalDuties > 0 ||
+                    !isset($detail->ShipmentRateDetail) ||
+                    !isset($detail->ShipmentRateDetail->TotalDutiesAndTaxes) ||
+                    !isset($detail->ShipmentRateDetail->DutiesAndTaxes)) continue;
+
+                $this->_totalDuties = floatval($detail->ShipmentRateDetail->TotalDutiesAndTaxes->Amount);
+                $this->parseItemDuties($detail->ShipmentRateDetail->DutiesAndTaxes);
+            }
         }
 
-        return $commodities;
+        return $this;
     }
 
-
-
-    public function setCredentials(string $key, string $password, string $accountNumber, string $meterNumber)
+    public function parseItemDuties($items = [])
     {
-        $this->_data['RequestedShipment']['ShippingChargesPayment']['Payor']['ResponsibleParty']['AccountNumber'] = $accountNumber;
-        $this->_data['RequestedShipment']['CustomsClearanceDetail']['DutiesPayment']['Payor']['ResponsibleParty']['AccountNumber'] = $accountNumber;
+        foreach($items as $i => $details)
+        {
+            foreach($details->Taxes as $j => $tax)
+            {
+                $parsed = [
+                    'tax_type'       => $tax->TaxType,
+                    'description'    => $tax->Description,
+                    'formula'        => $tax->Formula,
+                    'effective_date' => $tax->EffectiveDate,
+                    'name'           => $tax->Name,
+                    'taxable_value'  => floatval($tax->TaxableValue->Amount),
+                    'tax_value'      => floatval($tax->Amount->Amount),
+                ];
 
-        return parent::setCredentials($key, $password, $accountNumber, $meterNumber);
+                $this->_items[$i]->taxes[] = $parsed;
+            }
+        }
+    }
+
+    public function getItems(): array
+    {
+        return $this->_items;
+    }
+
+    public function getTotalCustomsAndDuties(): float
+    {
+        return $this->_totalDuties;
     }
 
 }
