@@ -13,7 +13,7 @@ trait NotificationParser
 
         $notifications = is_array($response->Notifications) ? $response->Notifications : [$response->Notifications];
 
-        foreach($response->Notifications as $note)
+        foreach($notifications as $note)
         {
             $notification = new Notification($note->Severity, $note->Source, $note->Code, $note->Message, $note->LocalizedMessage);
             $this->notifications[] = $notification;
