@@ -11,13 +11,15 @@ use Aquatic\FedEx\Response\Contract as ResponseContract;
 class Track extends Response
 {
     const STATUS_ERROR = -1;
-    const STATUS_PACKED = 0;
+    const STATUS_READY_TO_SHIP = 0;
+    const STATUS_PICKED_UP = 0.1;
     const STATUS_IN_TRANSIT = 1;
     const STATUS_DELIVERED = 2;
 
     public static $statusCodes = [
         -1 => 'Error',
         0 => 'Ready to Ship',
+        0.1 => 'Picked Up',
         1 => 'In Transit',
         2 => 'Delivered'
     ];
@@ -45,7 +47,7 @@ class Track extends Response
 
     public function isReadyToShip(): bool
     {
-        return $this->_status == static::STATUS_PACKED;
+        return $this->_status == static::STATUS_READY_TO_SHIP;
     }
 
     public function isDelivered(): bool
@@ -115,6 +117,9 @@ class Track extends Response
         }
 
         $this->last_update = Carbon::parse($this->events[0]->timestamp);
+
+        if(count($events) == 1)
+            $this->_status = static::STATUS_PICKED_UP;
 
         if(count($events) > 1)
             $this->_status = static::STATUS_IN_TRANSIT;
