@@ -15,7 +15,7 @@ trait NotificationParser
 
         foreach($notifications as $note)
         {
-            $notification = new Notification($note->Severity, $note->Source, $note->Code, $note->Message, $note->LocalizedMessage);
+            $notification = new Notification($note->Severity, $note->Source, $note->Code, $note->Message);
             $this->notifications[] = $notification;
         }
 
