@@ -2,24 +2,22 @@
 
 namespace Aquatic\FedEx\Response;
 
-use Aquatic\FedEx\Contract\Response\Notification as Contract;
+use Aquatic\FedEx\Contract\Response\Notification as NotificationContract;
 
-class Notification implements Contract
+class Notification implements NotificationContract
 {
     protected $severity = '',
               $source = '',
               $code = 0,
               $message = '',
-              $localized_message = '',
               $message_parameters = [];
 
-    public function __construct(string $severity, string $source, int $code, string $message, string $localized_message)
+    public function __construct(string $severity, string $source, int $code, string $message)
     {
         $this->severity = $severity;
         $this->source = $source;
         $this->code = $code;
         $this->message = $message;
-        $this->localized_message = $localized_message;
     }
 
     public function getSeverity(): string
@@ -40,11 +38,6 @@ class Notification implements Contract
     public function getMessage(): string
     {
         return $this->message;
-    }
-
-    public function getLocalizedMessage(): string
-    {
-        return $this->localized_message;
     }
 }
 
