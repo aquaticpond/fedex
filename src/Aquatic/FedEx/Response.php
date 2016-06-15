@@ -25,11 +25,11 @@ class Response implements ResponseContract
 
     public function getRaw()
     {
-        return $this->raw;
+        return $this->_raw;
     }
 
     public function getRequest(): RequestContract
     {
-        return $this->request;
+        return $this->_request;
     }
 }
