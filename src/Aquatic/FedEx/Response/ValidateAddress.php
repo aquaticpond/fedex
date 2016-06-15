@@ -19,7 +19,7 @@ class ValidateAddress extends Response
         $this->address_classification = strtolower($response->AddressResults->Classification);
 
         foreach($response->AddressResults->Attributes as $attribute)
-            $this->processValidationAttribute($attribute->Name, $attribute->Value == 'true' ? 1 : 0);
+            $this->processValidationAttribute($attribute->Name, ($attribute->Value == 'true'));
 
         return $this;
     }
@@ -29,25 +29,25 @@ class ValidateAddress extends Response
         switch($key)
         {
             case 'CountrySupported':
-                $value === 1 ?: $this->invalidate('Could not validate address because country is not supported by the service.');
+                if($value !== true) $this->invalidate('Could not validate address because country is not supported by the service.');
                 break;
             case 'Resolved':
-                $value === 1 ?: $this->invalidate('Could not resolve address.');
+                if($value !== true) $this->invalidate('Could not resolve address.');
                 break;
             case 'SuiteRequiredButMissing':
-                $value === 1 ?: $this->invalidate('A suite number is required with this address.');
+                if($value === true) $this->invalidate('A suite number is required with this address.');
                 break;
             case 'InvalidSuiteNumber':
-                $value === 1 ?: $this->invalidate('The suite number is invalid.');
+                if($value === true) $this->invalidate('The suite number is invalid.');
                 break;
             case 'StreetAddress':
-                $value === 1 ?: $this->invalidate('The street address could not be validated');
+                if($value !== true) $this->invalidate('The street address could not be validated');
                 break;
             case 'DPV':
-                $value === 1 ?: $this->invalidate('The address is not a valid for delivery.');
+                if($value !== true) $this->invalidate('The address is not a valid for delivery.');
                 break;
             case 'PostalValidated':
-                $value === 1 ?: $this->invalidate('Could not validate post code against with address data.');
+                if($value !== true) $this->invalidate('Could not validate post code against with address data.');
                 break;
         }
     }
