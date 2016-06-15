@@ -16,8 +16,7 @@ class ValidateAddress extends Request
     public function __construct(Address $address)
     {
         $this->data = [
-            'CarrierCode' => 'FDXE',
-            'AddressToValidate' => [
+            'AddressesToValidate' => [
                 'Address' => [
                     'StreetLines' => $address->getStreet(),
                     'City'        => $address->getCity(),
