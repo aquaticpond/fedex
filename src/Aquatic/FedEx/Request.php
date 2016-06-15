@@ -6,6 +6,7 @@ namespace Aquatic\FedEx;
 
 use Aquatic\FedEx\Request\Contract as RequestContract;
 use Aquatic\FedEx\Response\Contract as ResponseContract;
+use SoapClient;
 
 abstract class Request implements RequestContract
 {
@@ -13,6 +14,7 @@ abstract class Request implements RequestContract
     protected $_serviceId;
     protected $_wsdl;
     protected $_soapMethod;
+    protected $_soapInstance;
 
     public $data = [];
 
@@ -54,7 +56,7 @@ abstract class Request implements RequestContract
 
     public function send(ResponseContract $response_parser = null): ResponseContract
     {
-        $soap = new \SoapClient($this->_getWsdl(), ['trace' => 1]);
+        $soap = $this->getSoap();
 
         $method = $this->_soapMethod;
         $data = array_merge($this->_credentials, $this->data);
@@ -65,6 +67,14 @@ abstract class Request implements RequestContract
             $response_parser = new Response;
 
         return $response_parser->parse($result, $this);
+    }
+
+    public function getSoap(): SoapClient
+    {
+        if(!($this->_soapInstance instanceof SoapClient))
+            $this->_soapInstance = new SoapClient($this->_getWsdl(), ['trace' => 1]);
+
+        return $this->_soapInstance;
     }
 
     protected function _getWsdl(): string
