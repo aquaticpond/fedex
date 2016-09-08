@@ -34,7 +34,9 @@ class CustomsAndDuties extends Response
                     !isset($detail->ShipmentRateDetail->DutiesAndTaxes)) continue;
 
                 $this->_totalDuties = floatval($detail->ShipmentRateDetail->TotalDutiesAndTaxes->Amount);
-                $this->parseItemDuties($detail->ShipmentRateDetail->DutiesAndTaxes);
+
+                $item_duties = !is_array($detail->ShipmentRateDetail->DutiesAndTaxes) ? [$detail->ShipmentRateDetail->DutiesAndTaxes] : $detail->ShipmentRateDetail->DutiesAndTaxes;
+                $this->parseItemDuties($item_duties);
             }
         }
 
